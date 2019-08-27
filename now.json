@@ -1,0 +1,7 @@
+{
+  "build": {
+    "env": {
+      "REACT_APP_REDIRECT_URI": "https://playlisterizer.now.sh"
+    }
+  }
+}
