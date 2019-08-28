@@ -16,6 +16,8 @@ function useAuth(onClear) {
       );
       const currentTime = parseInt((new Date().getTime() / 1000).toFixed(0));
       const lsValid = localStorageAuth && localStorageTimeout > currentTime;
+      console.log(localStorageTimeout > currentTime);
+      console.log({ localStorageTimeout, currentTime });
       // If the localstorage is valid setValue
       if (lsValid) {
         setAuth(localStorageAuth);
@@ -35,12 +37,13 @@ function useAuth(onClear) {
           const value = q[2];
           authObj[key] = value;
         }
+        const newTimeout = currentTime + parseInt(authObj.expires_in)
         setAuth(authObj.access_token);
-        setTimeout(currentTime + authObj.expires_in);
+        setTimeout(newTimeout);
         window.localStorage.setItem(AUTH_KEY, authObj.access_token);
         window.localStorage.setItem(
           AUTH_TIMEOUT_KEY,
-          currentTime + authObj.expires_in
+          newTimeout
         );
       }
     }

@@ -59,9 +59,9 @@ function Analyzer({ match, getAuth }) {
               <DetailText>{`${state.playlist.length} songs`}</DetailText>
             </Flex>
           </Flex>
-          <div style={{ marginTop: '4em' }}>
-            <Flex>
-              <Flex style={{ width: '60%' }}>
+          <div>
+            <Flex align='flex-end' style={{ position: 'sticky', top: '0', height: '120px', backgroundColor: '#000', paddingBottom: '.25em'}}>
+              <Flex style={{ width: '60%', height: 'auto' }}>
                 <ListHeading w="50%">TITLE</ListHeading>
                 <ListHeading w="50%">ARTIST</ListHeading>
               </Flex>
