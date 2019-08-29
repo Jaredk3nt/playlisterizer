@@ -4,10 +4,11 @@ import { Route } from 'react-router-dom';
 import { withRouter } from 'react-router';
 import styled from '@emotion/styled';
 // Components
-import Authorize from './components/Authorize';
+
 import PlaylistList from './components/PlaylistList';
 import Analyzer from './components/Analyzer';
 import Flex from './components/Flex';
+import Header from './components/Header';
 // Hooks
 import useAuth from './hooks/useAuth';
 // Variables
@@ -50,12 +51,7 @@ function App({ history }) {
 
   return (
     <>
-      <Header>
-        <HeaderContent>
-          <h1>Playlisterizer</h1>
-          <Authorize auth={currentAuth} />
-        </HeaderContent>
-      </Header>
+      <Header auth={currentAuth}/>
       <Content>
         <Route
           path="/"
@@ -85,36 +81,6 @@ function App({ history }) {
   );
 }
 
-const Header = styled('header')`
-  background-color: #fff;
-  width: 100%;
-  height: 50px;
-`;
-const HeaderContent = styled('div')`
-  width: 1000px;
-  height: 100%;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  h1 {
-    color: black;
-    font-size: 1.25rem;
-    margin: 0;
-  }
-
-  a {
-    text-decoration: none;
-    background-color: #1db954;
-    border-radius: 12px;
-    padding: 4px 8px;
-  }
-
-  p {
-    color: black;
-  }
-`;
 const Content = styled('main')`
   width: 1000px;
   margin: 0 auto;
