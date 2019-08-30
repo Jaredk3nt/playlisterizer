@@ -5,19 +5,20 @@ import styled from '@emotion/styled';
 import Flex from './Flex';
 // State
 import { types, reducer, INITIAL_STATE } from '../state/analyzer';
+import { stat } from 'fs';
 
 function formatFeature(feature) {
   return (feature * 100).toFixed(1);
 }
 
 function rescaleFeature(feature) {
-  return ((feature + 60) * (1 + 2 / 3)).toFixed(1);
+  return ((((feature + 60) * (1 + 2 / 3)) - 65) * (10/3.5)).toFixed(1);
 }
 
 function Analyzer({ match, getAuth }) {
-  const [state, thunk] = useThunk(reducer, INITIAL_STATE);
+  const [state, thunk, dispatch] = useThunk(reducer, INITIAL_STATE);
   const auth = getAuth();
-
+  // Fetch playlist to be analyzed
   useEffect(() => {
     thunk(
       {
@@ -29,7 +30,7 @@ function Analyzer({ match, getAuth }) {
       [types.GET_PLAYLIST_REQ, types.GET_PLAYLIST_RES, types.GET_PLAYLIST_ERR]
     );
   }, [match.params.id, auth]);
-
+  // Fetch audio features of all playlist tracks
   useEffect(() => {
     if (state.playlist && state.playlist.length > 0) {
       thunk(
@@ -46,6 +47,35 @@ function Analyzer({ match, getAuth }) {
       );
     }
   }, [state.playlist, auth]);
+  // Generate playlist averages
+  useEffect(() => {
+    if (Object.keys(state.songs).length) {
+      const map = {
+        energy: 0,
+        danceability: 0,
+        acousticness: 0,
+        instrumentalness: 0,
+        liveness: 0,
+        speechiness: 0,
+        loudness: 0,
+      };
+      state.playlist.forEach(id => {
+        const song = state.songs[id];
+        map.energy = formatFeature(song.energy);
+        map.danceability = formatFeature(song.danceability);
+        map.acousticness = formatFeature(song.acousticness);
+        map.instrumentalness = formatFeature(song.instrumentalness);
+        map.liveness = formatFeature(song.liveness);
+        map.speechiness = formatFeature(song.speechiness);
+        map.loudness = rescaleFeature(song.loudness);
+      });
+      Object.entries(map).forEach(([average, value]) => {
+        dispatch({ type: types.UPDATE_AVERAGE, average, value });
+      });
+    }
+  }, [state.playlist, state.songs]);
+
+  console.log(state);
 
   return (
     <div>
@@ -60,7 +90,16 @@ function Analyzer({ match, getAuth }) {
             </Flex>
           </Flex>
           <div>
-            <Flex align='flex-end' style={{ position: 'sticky', top: '0', height: '120px', backgroundColor: '#000', paddingBottom: '.25em'}}>
+            <Flex
+              align="flex-end"
+              style={{
+                position: 'sticky',
+                top: '0',
+                height: '120px',
+                backgroundColor: '#000',
+                paddingBottom: '.25em',
+              }}
+            >
               <Flex style={{ width: '60%', height: 'auto' }}>
                 <ListHeading w="50%">TITLE</ListHeading>
                 <ListHeading w="50%">ARTIST</ListHeading>
@@ -112,6 +151,16 @@ function Analyzer({ match, getAuth }) {
                 </Flex>
               );
             })}
+            <br />
+            <Flex>
+              <Flex w="60%">
+                <SongName>Playlist Averages</SongName>
+              </Flex>
+              {state.averages &&
+                Object.values(state.averages).map(avg => (
+                  <Feature value={avg}>{avg}</Feature>
+                ))}
+            </Flex>
           </div>
         </>
       ) : null}

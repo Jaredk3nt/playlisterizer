@@ -7,8 +7,8 @@ const redirectUri = encodeURIComponent(process.env.REACT_APP_REDIRECT_URI);
 // Merge to a single auth URL
 const authUrl = `http://accounts.spotify.com/authorize?response_type=token&client_id=${clientId}&scope=${scopes}&redirect_uri=${redirectUri}`;
 
-function Authorize({ auth }) {
-  return !auth ? <AuthLink href={authUrl}>Sign In with Spotify</AuthLink> : <p>Signed In</p>;
+function Authorize({ user }) {
+  return !user ? <AuthLink href={authUrl}>Sign In with Spotify</AuthLink> : <p>Signed In</p>;
 }
 
 const AuthLink = styled('a')`

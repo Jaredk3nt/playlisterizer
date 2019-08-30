@@ -15,15 +15,17 @@ import useAuth from './hooks/useAuth';
 const LIMIT = 25;
 
 function App({ history }) {
+  const [user, setUser] = useState();
   const [offset, setOffset] = useState(0);
   const [playlists, setPlaylists] = useState([]);
   const [getAuth, clearAuth] = useAuth(() => {
     history.push('/');
     setPlaylists([]);
   });
-
+  // Fetch current auth token for requests
+  const auth = getAuth();
+  // Fetch list of playlists (also used for paging)
   useEffect(() => {
-    const auth = getAuth();
     if (auth) {
       axios
         .get('https://api.spotify.com/v1/me/playlists', {
@@ -40,25 +42,36 @@ function App({ history }) {
         });
     }
   }, [getAuth, offset]);
-
+  // Fetch user information
+  useEffect(() => {
+    if (auth && !user) {
+      axios
+        .get('https://api.spotify.com/v1/me', {
+          headers: { Authorization: `Bearer ${auth}` },
+        })
+        .then(res => {
+          console.log(res.data);
+          setUser(res.data);
+        });
+    }
+  });
+  // Helper function to up the page size to fetch new playlists
   function getNextPage() {
     setOffset(prev => {
       return prev + LIMIT;
     });
   }
 
-  const currentAuth = getAuth();
-
   return (
     <>
-      <Header auth={currentAuth}/>
+      <Header user={user} />
       <Content>
         <Route
           path="/"
           exact
           render={() => (
             <>
-              {!currentAuth && <h1>Sign in to start analyzing playlists!</h1>}
+              {!auth && <h1>Sign in to start analyzing playlists!</h1>}
               {playlists && <PlaylistList playlists={playlists} />}
               <Flex justify="center">
                 {playlists &&

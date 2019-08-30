@@ -6,6 +6,7 @@ const INITIAL_STATE = {
   songs: {},
   loadingPlaylist: false,
   loadingFeatures: false,
+  averages: {}
 };
 
 const types = enums(string)(
@@ -14,7 +15,8 @@ const types = enums(string)(
   'GET_PLAYLIST_ERR',
   'GET_FEATURES_REQ',
   'GET_FEATURES_RES',
-  'GET_FEATURES_ERR'
+  'GET_FEATURES_ERR',
+  'UPDATE_AVERAGE'
 );
 
 function mapFeaturesToSongs(songs, features) {
@@ -30,6 +32,14 @@ function mapFeaturesToSongs(songs, features) {
 
 function reducer(state, action) {
   switch (action.type) {
+    case types.UPDATE_AVERAGE:
+      return {
+        ...state,
+        averages: {
+          ...state.averages,
+          [action.average]: action.value
+        }
+      }
     case types.GET_PLAYLIST_REQ:
       return {
         ...state,
